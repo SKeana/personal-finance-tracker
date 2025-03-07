@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function TransactionForm() {
+function TransactionForm({ onAddTransaction }) {
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
@@ -16,8 +16,10 @@ function TransactionForm() {
       description: description,
     };
 
-    console.log(transaction);
+    // Pass the transaction to the parent component
+    onAddTransaction(transaction);
 
+    // Clear the form
     setDate('');
     setAmount('');
     setCategory('');

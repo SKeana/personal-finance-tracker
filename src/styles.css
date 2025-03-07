@@ -214,3 +214,51 @@
     animation: fadeIn 0.5s ease-out forwards;
   }
   
+
+  /* Transaction Table */
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.transaction-table th,
+.transaction-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.transaction-table thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.transaction-table th {
+  font-weight: 600;
+  color: #495057;
+}
+
+.transaction-table tbody tr {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.transaction-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.transaction-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.transaction-table tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+.transaction-list h3 {
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-weight: 600;
+}
