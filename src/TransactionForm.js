@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function TransactionForm({ onAddTransaction }) {
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    setDate(formattedDateTime);
+  }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -19,8 +31,7 @@ function TransactionForm({ onAddTransaction }) {
     // Pass the transaction to the parent component
     onAddTransaction(transaction);
 
-    // Clear the form
-    setDate('');
+    // Clear the form (except for the date)
     setAmount('');
     setCategory('');
     setDescription('');
@@ -31,9 +42,9 @@ function TransactionForm({ onAddTransaction }) {
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
-            <label htmlFor="date" className="form-label">Date</label>
+            <label htmlFor="date" className="form-label">Date and Time</label>
             <input
-              type="date"
+              type="datetime-local"
               id="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
