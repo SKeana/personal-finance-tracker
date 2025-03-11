@@ -1,40 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-function TransactionForm({ onAddTransaction }) {
-  const [date, setDate] = useState('');
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
+function TransactionForm({ transaction, onAddTransaction, onUpdateTransaction, onCancel }) {
+  const [date, setDate] = useState(transaction ? transaction.date : '');
+  const [amount, setAmount] = useState(transaction ? transaction.amount : '');
+  const [category, setCategory] = useState(transaction ? transaction.category : '');
+  const [description, setDescription] = useState(transaction ? transaction.description : '');
 
-  useEffect(() => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-
-    const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-    setDate(formattedDateTime);
-  }, []);
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const transaction = {
+    const transactionData = {
       date: date,
       amount: parseFloat(amount),
       category: category,
       description: description,
     };
 
-    // Pass the transaction to the parent component
-    onAddTransaction(transaction);
+    try {
+      let response;
+      if (transaction) {
+        // Update existing transaction
+        response = await fetch(`http://localhost:5000/transactions/${transaction.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(transactionData),
+        });
+      } else {
+        // Create new transaction
+        response = await fetch('http://localhost:5000/transactions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(transactionData),
+        });
+      }
 
-    // Clear the form (except for the date)
-    setAmount('');
-    setCategory('');
-    setDescription('');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Transaction saved:', data.transaction);
+      if (transaction) {
+        onUpdateTransaction(data.transaction);
+      } else {
+        onAddTransaction(data.transaction);
+      }
+
+    } catch (error) {
+      console.error('Failed to save transaction:', error);
+    }
   };
 
   return (
@@ -42,7 +60,7 @@ function TransactionForm({ onAddTransaction }) {
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
-            <label htmlFor="date" className="form-label">Date and Time</label>
+            <label htmlFor="date" className="form-label">Date</label>
             <input
               type="datetime-local"
               id="date"
@@ -53,7 +71,7 @@ function TransactionForm({ onAddTransaction }) {
             />
           </div>
         </div>
-        
+
         <div className="form-col">
           <div className="form-group">
             <label htmlFor="amount" className="form-label">Amount ($)</label>
@@ -71,7 +89,7 @@ function TransactionForm({ onAddTransaction }) {
           </div>
         </div>
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="category" className="form-label">Category</label>
         <select
@@ -94,7 +112,7 @@ function TransactionForm({ onAddTransaction }) {
           <option value="Other">Other</option>
         </select>
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="description" className="form-label">Description</label>
         <textarea
@@ -106,13 +124,22 @@ function TransactionForm({ onAddTransaction }) {
           className="form-control"
         />
       </div>
-      
-      <button 
+
+      <button
         type="submit"
         className="btn btn-success"
       >
-        Save Transaction
+        {transaction ? 'Update Transaction' : 'Add Transaction'}
       </button>
+      {transaction && (
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={onCancel}
+        >
+          Cancel
+        </button>
+      )}
     </form>
   );
 }
