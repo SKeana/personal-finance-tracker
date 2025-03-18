@@ -1,6 +1,5 @@
-import { request } from "express";
-
-const app = request('express')();
+const express = require('express');
+const app = express();
 const PORT = 8080;
 
 app.listen(
